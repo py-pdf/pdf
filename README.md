@@ -1,3 +1,5 @@
+[![PyPI version](https://badge.fury.io/py/pdffile.svg)](https://badge.fury.io/py/pdffile)
+[![Code](https://img.shields.io/badge/code-GitHub-brightgreen)](https://github.com/py-pdf/pdf)
 [![Actions Status](https://github.com/py-pdf/pdf/workflows/Unit%20Tests/badge.svg)](https://github.com/py-pdf/pdf/actions)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
