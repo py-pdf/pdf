@@ -1,0 +1,4 @@
+pytest
+PyPDF2
+pytest-cov
+pytest-timeout
