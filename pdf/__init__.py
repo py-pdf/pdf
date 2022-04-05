@@ -2,19 +2,35 @@ import datetime
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Iterator, List, Optional, TypeVar, Union
 
 import PyPDF2.pdf
 
 
 @dataclass
 class Metadata:
+    # What is the doucment about?
     title: Optional[str] = None
-    producer: Optional[str] = None
-    creator: Optional[str] = None
+    subject: Optional[str] = None
+    keywords: Optional[str] = None
+
+    # Who created it when?
+    author: Optional[str] = None
     creation_date: Optional[datetime.datetime] = None
     modification_date: Optional[datetime.datetime] = None
+
+    # How was the document created?
+    producer: Optional[str] = None
+    creator: Optional[str] = None
+
+    # More information
     other: Optional[Dict[str, Any]] = None
+
+
+@dataclass
+class Links:
+    page: int
+    text: Optional[str] = None
 
 
 class PdfPage:
@@ -57,18 +73,42 @@ class PdfFile:
         metadict = self.reader.getDocumentInfo()
         data = dict(metadict)
         meta = Metadata()
-        meta.producer = data.get("/Producer")
-        meta.creator = data.get("/Creator")
+        meta.title = data.get("/Title")
+        meta.subject = data.get("/Subject")
+        meta.keywords = data.get("/Keywords")
+        meta.author = data.get("/Author")
         if "/CreationDate" in data:
             meta.creation_date = datestr_to_datetime(data["/CreationDate"])
         if "/ModDate" in data:
             meta.modification_date = datestr_to_datetime(data["/ModDate"])
+        meta.producer = data.get("/Producer")
+        meta.creator = data.get("/Creator")
         meta.other = {}
         for key in data:
-            if key in ["/Producer", "/Creator"]:
+            if key in [
+                "/Title",
+                "/Subject",
+                "/Keywords",
+                "/Author",
+                "/Producer",
+                "/Creator",
+            ]:
                 continue
             meta.other[key] = metadict[key]
         return meta
+
+    @property
+    def outline(self) -> List[Links]:
+        captured = []
+        outlines = self.reader.getOutlines()
+        for ol in iter_page(outlines):
+            captured.append(
+                Links(
+                    page=self.reader.getDestinationPageNumber(ol),
+                    text=ol.title,
+                )
+            )
+        return captured
 
     # Context manager methods
     def __enter__(self) -> "PdfFile":
@@ -117,3 +157,16 @@ def datestr_to_datetime(d: str) -> datetime.datetime:
     if "'" in d:
         d = d[:-7]  # Strip offset - we lose information here!
     return datetime.datetime.strptime(d, "%Y%m%d%H%M%S")
+
+
+T = TypeVar("T")
+
+
+def iter_page(
+    iterable_or_page: Union[T, List[T], List[List[T]]]
+) -> Iterator[T]:
+    if isinstance(iterable_or_page, list):
+        for inner in iterable_or_page:
+            yield from iter_page(inner)
+    else:
+        yield iterable_or_page
