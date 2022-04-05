@@ -42,6 +42,16 @@ pip install pdffile
 {'/Producer': 'pdfTeX-1.40.23', '/Creator': 'TeX', '/CreationDate': "D:20220403180542+02'00'", '/ModDate': "D:20220403180542+02'00'", '/Trapped': '/False', '/PTEX.Fullbanner': 'This is pdfTeX, Version 3.141592653-2.6-1.40.23 (TeX Live 2021) kpathsea version 6.3.3'}
 ```
 
+### Encrypted PDFs
+
+If you have an encrypted PDF, just provide the key:
+
+```python
+doc = pdf.PdfFile(pdf_path, password=password)
+```
+
+All following operations work just as described.
+
 ### Extract Text
 
 ```pycon
