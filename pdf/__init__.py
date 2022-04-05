@@ -1,8 +1,20 @@
+import datetime
 import os
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Union
+from typing import Any, Dict, Optional, Union
 
 import PyPDF2.pdf
+
+
+@dataclass
+class Metadata:
+    title: str
+    producer: str
+    creator: str
+    creation_date: datetime.datetime
+    modification_date: datetime.datetime
+    other: Dict[str, Any]
 
 
 class PdfPage:
@@ -22,13 +34,22 @@ class PdfFile:
 
     fp = None
 
-    def __init__(self, file: Union[str, Path], mode: str = "rb") -> None:
+    def __init__(
+        self,
+        file: Union[str, Path],
+        mode: str = "rb",
+        password: Optional[str] = None,
+    ) -> None:
         if isinstance(file, os.PathLike):
             file = os.fspath(file)
         if isinstance(file, str):
             fp = open(file, mode)
         self.fp = fp
+        self.password = password
         self.reader = PyPDF2.PdfFileReader(self.fp)
+
+        if self.reader.isEncrypted and self.password is not None:
+            self.reader.decrypt(self.password)
         self.current_page = 0
 
     @property
@@ -74,14 +95,9 @@ class PdfFile:
         return self[self.current_page - 1]
 
     # Custom methods
+    @property
     def text(self) -> str:
         text = ""
         for page in self:
             text += page.text
         return text
-
-
-class PdfFileReader:
-    def __init__(self, reader: PyPDF2.PdfFileReader) -> None:
-        self.reader = reader
-        self.metadata = self.reader.getDocumentInfo()
