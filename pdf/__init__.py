@@ -9,12 +9,12 @@ import PyPDF2.pdf
 
 @dataclass
 class Metadata:
-    title: str
-    producer: str
-    creator: str
-    creation_date: datetime.datetime
-    modification_date: datetime.datetime
-    other: Dict[str, Any]
+    title: Optional[str] = None
+    producer: Optional[str] = None
+    creator: Optional[str] = None
+    creation_date: Optional[datetime.datetime] = None
+    modification_date: Optional[datetime.datetime] = None
+    other: Optional[Dict[str, Any]] = None
 
 
 class PdfPage:
@@ -53,14 +53,22 @@ class PdfFile:
         self.current_page = 0
 
     @property
-    def metadata(self) -> Dict[str, Any]:
-        # TODO: Can this be made more consistent / nicer?
-        # Currently it looks like this:
-        # {'/Producer': 'pdfTeX-1.40.23',
-        # '/Creator': 'TeX', '/CreationDate': "D:20220403180542+02'00'",
-        # '/ModDate': "D:20220403180542+02'00'", '/Trapped': '/False',
-        # '/PTEX.Fullbanner': 'This is pdfTeX, Ver...3'}
-        return self.reader.getDocumentInfo()  # type: ignore
+    def metadata(self) -> Metadata:
+        metadict = self.reader.getDocumentInfo()
+        data = dict(metadict)
+        meta = Metadata()
+        meta.producer = data.get("/Producer")
+        meta.creator = data.get("/Creator")
+        if "/CreationDate" in data:
+            meta.creation_date = datestr_to_datetime(data["/CreationDate"])
+        if "/ModDate" in data:
+            meta.modification_date = datestr_to_datetime(data["/ModDate"])
+        meta.other = {}
+        for key in data:
+            if key in ["/Producer", "/Creator"]:
+                continue
+            meta.other[key] = metadict[key]
+        return meta
 
     # Context manager methods
     def __enter__(self) -> "PdfFile":
@@ -101,3 +109,11 @@ class PdfFile:
         for page in self:
             text += page.text
         return text
+
+
+def datestr_to_datetime(d: str) -> datetime.datetime:
+    if d.startswith("D:"):
+        d = d[2:]
+    if "'" in d:
+        d = d[:-7]  # Strip offset - we lose information here!
+    return datetime.datetime.strptime(d, "%Y%m%d%H%M%S")
