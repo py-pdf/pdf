@@ -52,3 +52,5 @@ pip install pdffile
 >>> doc[0].text
 'Loremipsumdolorsitamet,consetetursadipscingelitr,seddiamnonumyeirmod\ntemporinviduntutlaboreetdoloremagnaaliquyamerat,seddiamvoluptua.Atvero\neosetaccusametjustoduodoloresetearebum.Stetclitakasdgubergren,noseataki-\nmatasanctusestLoremipsumdolorsitamet.Loremipsumdolorsitamet,consetetur\nsadipscingelitr,seddiamnonumyeirmodtemporinviduntutlaboreetdoloremagna\naliquyamerat,seddiamvoluptua.Atveroeosetaccusametjustoduodoloresetea\nrebum.Stetclitakasdgubergren,noseatakimatasanctusestLoremipsumdolorsit\namet.\n1\n'
 ```
+
+Alternatively, you can use `doc.text` to get the text of all pages.
