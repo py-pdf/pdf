@@ -63,6 +63,21 @@ doc = pdf.PdfFile(pdf_path, password=password)
 
 All following operations work just as described.
 
+
+## Get Outline
+
+```pycon
+>>> import pdf
+>>> doc = pdf.PdfFile(pdf_path, password=password)
+>>> doc.outline
+[
+    Links(page=5, text='1 Header'),
+    Links(page=5, text='1.1 A section'),
+    Links(page=9, text='2 Foobar'),
+    Links(page=108, text='References')
+]
+```
+
 ### Extract Text
 
 ```pycon
