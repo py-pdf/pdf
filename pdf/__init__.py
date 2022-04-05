@@ -29,6 +29,7 @@ class PdfFile:
             fp = open(file, mode)
         self.fp = fp
         self.reader = PyPDF2.PdfFileReader(self.fp)
+        self.current_page = 0
 
     @property
     def metadata(self) -> Dict[str, Any]:
@@ -40,6 +41,7 @@ class PdfFile:
         # '/PTEX.Fullbanner': 'This is pdfTeX, Ver...3'}
         return self.reader.getDocumentInfo()  # type: ignore
 
+    # Context manager methods
     def __enter__(self) -> "PdfFile":
         return self
 
@@ -53,11 +55,30 @@ class PdfFile:
     def open(self, name: Any, mode: str = "rb") -> PyPDF2.PdfFileReader:
         return self.reader
 
+    # List interface
     def __getitem__(self, key: int) -> PdfPage:
         return PdfPage(self.reader.getPage(key))
 
     def __len__(self) -> int:
         return self.reader.getNumPages()  # type: ignore
+
+    # Iterator
+    def __iter__(self) -> "PdfFile":
+        return self
+
+    def __next__(self) -> PdfPage:
+        if self.current_page == len(self):
+            raise StopIteration
+        print(self.current_page)
+        self.current_page += 1
+        return self[self.current_page - 1]
+
+    # Custom methods
+    def text(self) -> str:
+        text = ""
+        for page in self:
+            text += page.text
+        return text
 
 
 class PdfFileReader:
