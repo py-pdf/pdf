@@ -39,7 +39,18 @@ pip install pdffile
 1
 
 >>> doc.metadata
-{'/Producer': 'pdfTeX-1.40.23', '/Creator': 'TeX', '/CreationDate': "D:20220403180542+02'00'", '/ModDate': "D:20220403180542+02'00'", '/Trapped': '/False', '/PTEX.Fullbanner': 'This is pdfTeX, Version 3.141592653-2.6-1.40.23 (TeX Live 2021) kpathsea version 6.3.3'}
+Metadata(
+    title=None,
+    producer='pdfTeX-1.40.23',
+    creator='TeX',
+    creation_date=datetime.datetime(2022, 4, 3, 18, 5, 42),
+    modification_date=datetime.datetime(2022, 4, 3, 18, 5, 42)
+    other={
+         '/CreationDate': "D:20220403180542+02'00'",
+         '/ModDate': "D:20220403180542+02'00'",
+         '/Trapped': '/False',
+         '/PTEX.Fullbanner': 'This is pdfTeX, V...'})
+
 ```
 
 ### Encrypted PDFs
